@@ -1,178 +1,657 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NEXUS Inc. | 未来をデザインする</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>石 — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --accent: #c8f542;
+    --accent2: #42c8f5;
+    --text: #e8e8e8;
+    --muted: #555;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+    --font-body: 'Noto Serif JP', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: exclusion;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.3s ease;
+    mix-blend-mode: exclusion;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9000;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(8,8,8,0.9);
+    border-bottom-color: var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,245,66,0.08) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    animation: pulse 6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+  }
+  .hero-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  .hero-name {
+    font-family: var(--font-display);
+    font-size: clamp(7rem, 20vw, 18rem);
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+  .hero-name span { color: var(--accent); }
+  .hero-sub {
+    margin-top: 40px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .hero-pill {
+    border: 1px solid var(--border);
+    padding: 8px 20px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .hero-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .hero-scroll {
+    position: absolute;
+    right: 48px;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    opacity: 0;
+    animation: fadeUp 1s 1.2s forwards;
+  }
+  .hero-scroll::after {
+    content: '';
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(var(--accent), transparent);
+    animation: lineGrow 2s 1.5s ease-out infinite;
+  }
+  @keyframes lineGrow {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 120px 48px;
+    border-top: 1px solid var(--border);
+  }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 80px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    margin-bottom: 60px;
+  }
+
+  /* SKILLS */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .skill-card {
+    background: var(--bg);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(200,245,66,0.04) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .skill-card:hover { background: var(--surface); }
+  .skill-card:hover::before { opacity: 1; }
+  .skill-num {
+    font-family: var(--font-display);
+    font-size: 5rem;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 24px;
+    transition: color 0.3s;
+  }
+  .skill-card:hover .skill-num { color: rgba(200,245,66,0.15); }
+  .skill-name {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .skill-desc {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .skill-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* WORKS */
+  .works-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .work-item {
+    background: var(--bg);
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    transition: background 0.3s;
+    cursor: pointer;
+  }
+  .work-item:hover { background: var(--surface); }
+  .work-left { flex: 1; }
+  .work-category {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .work-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    letter-spacing: 0.03em;
+    color: var(--text);
+  }
+  .work-year {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .work-arrow {
+    width: 48px; height: 48px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 1.2rem;
+    transition: all 0.3s;
+  }
+  .work-item:hover .work-arrow {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: rotate(45deg);
+  }
+
+  /* ABOUT */
+  .about-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .about-text {
+    font-size: 1rem;
+    line-height: 2;
+    color: rgba(232,232,232,0.7);
+  }
+  .about-text p + p { margin-top: 24px; }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    align-self: start;
+  }
+  .stat-block {
+    background: var(--bg);
+    padding: 40px 32px;
+  }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* CONTACT */
+  .contact-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .contact-cta {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 0.9;
+    color: var(--text);
+  }
+  .contact-cta span { color: var(--accent); }
+  .contact-links { display: flex; flex-direction: column; gap: 16px; align-items: flex-end; }
+  .contact-link {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: color 0.2s;
+  }
+  .contact-link:hover { color: var(--accent); }
+  .contact-link::before { content: '→'; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* Reveal animation */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 0 24px 60px; }
+    section { padding: 80px 24px; }
+    .about-layout { grid-template-columns: 1fr; gap: 48px; }
+    footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="#" class="logo">NEXUS</a>
-      <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#team">Team</a></li>
-        <li><a href="#contact" class="btn-nav">Contact</a></li>
-      </ul>
-      <button class="hamburger" id="hamburger">&#9776;</button>
-    </div>
-  </nav>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- HERO -->
-  <section id="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-      <p class="hero-sub">Innovation Beyond Boundaries</p>
-      <h1>未来を、<br>ともにデザインする。</h1>
-      <p class="hero-desc">テクノロジーとクリエイティビティで、あなたのビジネスを次のステージへ。</p>
-      <div class="hero-btns">
-        <a href="#services" class="btn-primary">サービスを見る</a>
-        <a href="#contact" class="btn-outline">お問い合わせ</a>
+<nav id="nav">
+  <div class="nav-logo">石</div>
+  <ul class="nav-links">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#works">Works</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div>
+    <div class="hero-tag">Portfolio 2025</div>
+    <h1 class="hero-name">石<span>.</span></h1>
+    <div class="hero-sub">
+      <div class="hero-pill">開発PM</div>
+      <div class="hero-pill">AI生成</div>
+      <div class="hero-pill">音声作品ディレクション</div>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">001 — What I Do</div>
+  <h2 class="section-title reveal">SKILLS</h2>
+  <div class="skills-grid reveal">
+    <div class="skill-card">
+      <div class="skill-num">01</div>
+      <div class="skill-name">開発 PM</div>
+      <div class="skill-desc">プロダクト開発の全体設計から進行管理まで。チームを束ね、複雑な要件をシンプルなロードマップへ落とし込む。</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Agile</span>
+        <span class="skill-tag">Scrum</span>
+        <span class="skill-tag">WBS</span>
+        <span class="skill-tag">要件定義</span>
       </div>
     </div>
-    <div class="scroll-indicator"><span></span></div>
-  </section>
-
-  <!-- STATS -->
-  <section id="stats">
-    <div class="stats-grid">
-      <div class="stat-item"><span class="stat-num">200+</span><span class="stat-label">プロジェクト実績</span></div>
-      <div class="stat-item"><span class="stat-num">98%</span><span class="stat-label">顧客満足度</span></div>
-      <div class="stat-item"><span class="stat-num">50+</span><span class="stat-label">チームメンバー</span></div>
-      <div class="stat-item"><span class="stat-num">10年</span><span class="stat-label">業界実績</span></div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="container">
-      <div class="about-grid">
-        <div class="about-visual">
-          <div class="about-card">
-            <div class="card-glow"></div>
-            <p class="card-year">Est. 2014</p>
-            <p class="card-tagline">"Design the future,<br>today."</p>
-          </div>
-        </div>
-        <div class="about-text">
-          <p class="section-label">About Us</p>
-          <h2>テクノロジーで<br>世界を変える。</h2>
-          <p>NEXUSは、デジタルトランスフォーメーションを軸に、企業の課題を革新的なソリューションで解決してきました。2014年の創業以来、200社以上のパートナーとともに成長し続けています。</p>
-          <p>私たちは「人・技術・創造性」を融合させ、持続可能な価値を生み出すことをミッションとしています。</p>
-          <a href="#services" class="btn-primary">私たちのサービス</a>
-        </div>
+    <div class="skill-card">
+      <div class="skill-num">02</div>
+      <div class="skill-name">AI 生成</div>
+      <div class="skill-desc">生成AIを活用したコンテンツ制作・ワークフロー構築。プロンプトエンジニアリングから実装まで一気通貫で対応。</div>
+      <div class="skill-tags">
+        <span class="skill-tag">LLM</span>
+        <span class="skill-tag">Prompt Eng.</span>
+        <span class="skill-tag">画像生成</span>
+        <span class="skill-tag">自動化</span>
       </div>
     </div>
-  </section>
-
-  <!-- SERVICES -->
-  <section id="services">
-    <div class="container">
-      <p class="section-label center">Services</p>
-      <h2 class="center">私たちができること</h2>
-      <div class="services-grid">
-        <div class="service-card">
-          <div class="service-icon">&#9881;</div>
-          <h3>DX コンサルティング</h3>
-          <p>ビジネス課題を深く理解し、デジタル変革戦略を設計。現場に寄り添った実践的な支援を行います。</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#128187;</div>
-          <h3>プロダクト開発</h3>
-          <p>アイデアをプロダクトへ。UXリサーチから設計・開発・リリースまでワンストップで対応します。</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#127760;</div>
-          <h3>グローバル展開支援</h3>
-          <p>海外市場への進出をトータルサポート。現地パートナーネットワークと連携し、スムーズな展開を実現します。</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#128200;</div>
-          <h3>データ分析 &amp; AI</h3>
-          <p>膨大なデータを価値ある洞察へ変換。AIを活用した意思決定の高度化を支援します。</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#128274;</div>
-          <h3>セキュリティ対策</h3>
-          <p>最新の脅威に対応したセキュリティ体制を構築。企業の大切な資産を守ります。</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#9729;</div>
-          <h3>クラウドインフラ</h3>
-          <p>スケーラブルで安定したクラウド環境を設計・運用。コスト最適化も同時に実現します。</p>
-        </div>
+    <div class="skill-card">
+      <div class="skill-num">03</div>
+      <div class="skill-name">音声 Dir.</div>
+      <div class="skill-desc">音声作品のディレクションを担当。企画・脚本から収録・編集・リリースまで、クオリティを妥協なく追求する。</div>
+      <div class="skill-tags">
+        <span class="skill-tag">脚本</span>
+        <span class="skill-tag">収録</span>
+        <span class="skill-tag">編集</span>
+        <span class="skill-tag">音声演出</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- TEAM -->
-  <section id="team">
-    <div class="container">
-      <p class="section-label center">Our Team</p>
-      <h2 class="center">チームメンバー</h2>
-      <div class="team-grid">
-        <div class="team-card">
-          <div class="team-avatar" style="background: linear-gradient(135deg,#667eea,#764ba2);">TK</div>
-          <h3>田中 健一</h3>
-          <p class="team-role">CEO &amp; Co-Founder</p>
-          <p class="team-bio">元Google エンジニア。10年以上の技術・経営経験を持つ。</p>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar" style="background: linear-gradient(135deg,#f093fb,#f5576c);">SM</div>
-          <h3>佐藤 美咲</h3>
-          <p class="team-role">CTO &amp; Co-Founder</p>
-          <p class="team-bio">MIT Computer Science卒。AI・クラウド領域のスペシャリスト。</p>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar" style="background: linear-gradient(135deg,#4facfe,#00f2fe);">YW</div>
-          <h3>渡辺 勇太</h3>
-          <p class="team-role">Head of Design</p>
-          <p class="team-bio">国内外受賞歴多数。ユーザー中心設計の第一人者。</p>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar" style="background: linear-gradient(135deg,#43e97b,#38f9d7);">NK</div>
-          <h3>中村 希</h3>
-          <p class="team-role">Head of Business</p>
-          <p class="team-bio">大手コンサル出身。国内外100社以上の事業支援実績。</p>
-        </div>
+<!-- WORKS -->
+<section id="works">
+  <div class="section-label">002 — What I've Built</div>
+  <h2 class="section-title reveal">WORKS</h2>
+  <div class="works-list reveal">
+    <div class="work-item">
+      <div class="work-left">
+        <div class="work-category">開発 PM</div>
+        <div class="work-title">プロダクトAローンチ</div>
+      </div>
+      <div class="work-year">2024</div>
+      <div class="work-arrow">↗</div>
+    </div>
+    <div class="work-item">
+      <div class="work-left">
+        <div class="work-category">AI 生成</div>
+        <div class="work-title">AI コンテンツ自動化システム</div>
+      </div>
+      <div class="work-year">2024</div>
+      <div class="work-arrow">↗</div>
+    </div>
+    <div class="work-item">
+      <div class="work-left">
+        <div class="work-category">音声ディレクション</div>
+        <div class="work-title">オーディオドラマ作品</div>
+      </div>
+      <div class="work-year">2023</div>
+      <div class="work-arrow">↗</div>
+    </div>
+    <div class="work-item">
+      <div class="work-left">
+        <div class="work-category">開発 PM × AI</div>
+        <div class="work-title">生成AI活用 業務効率化プロジェクト</div>
+      </div>
+      <div class="work-year">2023</div>
+      <div class="work-arrow">↗</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">003 — Who I Am</div>
+  <h2 class="section-title reveal">ABOUT</h2>
+  <div class="about-layout reveal">
+    <div class="about-text">
+      <p>開発PMとして多様なプロダクト立ち上げに携わりながら、AI生成技術と音声作品ディレクションという2つの専門領域を持つクリエイター。</p>
+      <p>「技術」と「表現」の交差点に立ち、プロジェクトを構想から完成まで丁寧に育てることを信条としている。</p>
+      <p>生成AIの進化を最前線でキャッチアップし続け、実務に落とし込む実践者として活動中。</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat-block">
+        <div class="stat-num">5+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">20+</div>
+        <div class="stat-label">Projects</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Expertise Areas</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Curiosity</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="container">
-      <p class="section-label center">Contact</p>
-      <h2 class="center">お問い合わせ</h2>
-      <p class="contact-sub center">プロジェクトのご相談・採用・パートナーシップなど、お気軽にご連絡ください。</p>
-      <form class="contact-form" onsubmit="handleSubmit(event)">
-        <div class="form-row">
-          <input type="text" placeholder="お名前" required />
-          <input type="email" placeholder="メールアドレス" required />
-        </div>
-        <input type="text" placeholder="件名" required />
-        <textarea rows="5" placeholder="メッセージ" required></textarea>
-        <button type="submit" class="btn-primary">送信する</button>
-      </form>
-      <div id="form-success" class="form-success" style="display:none;">
-        &#10003; メッセージを受け付けました。3営業日以内にご返信いたします。
-      </div>
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">004 — Get In Touch</div>
+  <div class="contact-inner reveal">
+    <div class="contact-cta">LET'S<br>WORK<br><span>TOGETHER.</span></div>
+    <div class="contact-links">
+      <a href="mailto:hello@example.com" class="contact-link">hello@example.com</a>
+      <a href="#" class="contact-link">Twitter / X</a>
+      <a href="#" class="contact-link">GitHub</a>
+      <a href="#" class="contact-link">Note</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-inner">
-      <p class="footer-logo">NEXUS</p>
-      <p class="footer-copy">&copy; 2026 NEXUS Inc. All rights reserved.</p>
-    </div>
-  </footer>
+<footer>
+  <span>© 2025 石. All rights reserved.</span>
+  <span>Built with intent.</span>
+</footer>
 
-  <script src="main.js"></script>
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+  });
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx - 18 + 'px';
+    ring.style.top = ry - 18 + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 100);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
