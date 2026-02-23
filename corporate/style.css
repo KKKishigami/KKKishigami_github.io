@@ -203,6 +203,19 @@ h2 {
 .team-card h3 { color: var(--white); font-size: 1rem; margin-bottom: 0.3rem; }
 .team-role { color: #a78bfa; font-size: 0.8rem; margin-bottom: 0.8rem; font-weight: 600; }
 .team-bio { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+.featured-founder {
+  border-color: rgba(200,245,66,0.3);
+  position: relative;
+}
+.featured-founder::before {
+  content: 'Founder';
+  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #c8f542, #42c8f5);
+  color: #080808; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 3px 14px; border-radius: 0 0 8px 8px;
+}
+.featured-founder:hover { border-color: rgba(200,245,66,0.6); box-shadow: 0 20px 40px rgba(200,245,66,0.08); }
 
 /* --- CONTACT --- */
 #contact { background: var(--dark); }
