@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="30種類のタイプ診断で、あなたの本当のタイプを発見しよう。恋愛・仕事・性格など様々な角度から診断します。">
+  <title>タイプ診断 | 30種類の性格・行動診断</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header id="header">
+    <div class="header-inner">
+      <a href="#" class="logo" id="logo-link">タイプ診断</a>
+      <nav class="header-nav">
+        <a href="https://kkkishigami.github.io/KKKishigami_github.io/" class="nav-back">← サイトトップ</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- VIEW: LIST -->
+  <main id="view-list" class="view active">
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <span class="hero-label">PERSONALITY DIAGNOSIS</span>
+        <h1>タイプ診断</h1>
+        <p class="hero-desc">10問に答えるだけで、あなたの本当のタイプがわかる。<br>30種類の診断からお好きなものをどうぞ。</p>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num">30</span><span class="stat-lbl">診断カテゴリ</span></div>
+          <div class="stat"><span class="stat-num">10</span><span class="stat-lbl">問 / 診断</span></div>
+          <div class="stat"><span class="stat-num">4</span><span class="stat-lbl">タイプ / 診断</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="list-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">ALL DIAGNOSES</span>
+          <h2>診断を選ぼう</h2>
+        </div>
+        <div id="diagnosis-grid" class="diagnosis-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- VIEW: QUIZ -->
+  <main id="view-quiz" class="view">
+    <div class="container">
+      <div class="quiz-topbar">
+        <button id="back-btn" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          戻る
+        </button>
+        <span id="quiz-title" class="quiz-title-text"></span>
+      </div>
+      <div class="progress-wrapper">
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <span class="progress-label"><span id="q-num">1</span> / 10</span>
+      </div>
+      <div id="question-area" class="question-area">
+        <p id="question-text" class="question-text"></p>
+        <div id="options-list" class="options-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- VIEW: RESULT -->
+  <main id="view-result" class="view">
+    <div class="container">
+      <div id="result-card" class="result-card">
+        <div class="result-top">
+          <span id="result-diag-icon" class="result-diag-icon"></span>
+          <p class="result-eyebrow">あなたは...</p>
+          <h2 id="result-type-name" class="result-type-name"></h2>
+        </div>
+        <div class="result-sections">
+          <div class="result-block">
+            <h3 class="result-block-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              特徴
+            </h3>
+            <p id="result-desc" class="result-text"></p>
+          </div>
+          <div class="result-block">
+            <h3 class="result-block-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+              アドバイス
+            </h3>
+            <p id="result-advice" class="result-text"></p>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button id="share-btn" class="btn-share">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            シェアする
+          </button>
+          <button id="retry-btn" class="btn-outline">もう一度</button>
+          <button id="top-btn" class="btn-outline">他の診断を見る</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="footer">
+    <div class="footer-inner">
+      <span class="footer-logo">タイプ診断</span>
+      <p class="footer-copy">&copy; 2025 KKKishigami. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
