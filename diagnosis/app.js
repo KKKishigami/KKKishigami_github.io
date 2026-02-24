@@ -698,83 +698,96 @@ const diagnoses = [
 // ============================================================
 //  App State & Logic
 // ============================================================
-const state = { currentId: null, qIndex: 0, scores: {} };
+var state = { currentId: null, qIndex: 0, scores: {} };
 
-function $(id) { return document.getElementById(id); }
+function getEl(id) { return document.getElementById(id); }
 
 function showView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  $('view-' + name).classList.add('active');
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+  getEl('view-' + name).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── LIST ──────────────────────────────────────────────────
 function renderList() {
-  const grid = $('diagnosis-grid');
-  grid.innerHTML = diagnoses.map((d, i) => `
-    <div class="diag-card" onclick="startDiagnosis(${d.id})" role="button" tabindex="0"
-         onkeydown="if(event.key==='Enter')startDiagnosis(${d.id})">
-      <span class="diag-icon">${d.icon}</span>
-      <span class="diag-num">No.${String(i + 1).padStart(2, '0')}</span>
-      <h3 class="diag-title">${d.title}</h3>
-      <p class="diag-desc">${d.desc}</p>
-      <span class="diag-start">診断スタート
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </span>
-    </div>
-  `).join('');
+  var grid = getEl('diagnosis-grid');
+  var html = '';
+  for (var i = 0; i < diagnoses.length; i++) {
+    var d = diagnoses[i];
+    html += '<div class="diag-card" data-id="' + d.id + '" role="button" tabindex="0">' +
+      '<span class="diag-icon">' + d.icon + '</span>' +
+      '<span class="diag-num">No.' + String(i + 1).padStart(2, '0') + '</span>' +
+      '<h3 class="diag-title">' + d.title + '</h3>' +
+      '<p class="diag-desc">' + d.desc + '</p>' +
+      '<span class="diag-start">診断スタート' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' +
+      '<polyline points="9 18 15 12 9 6"/></svg></span>' +
+      '</div>';
+  }
+  grid.innerHTML = html;
 }
 
 // ── QUIZ ──────────────────────────────────────────────────
 function startDiagnosis(id) {
-  const d = diagnoses.find(x => x.id === id);
+  var d = null;
+  for (var i = 0; i < diagnoses.length; i++) {
+    if (diagnoses[i].id === id) { d = diagnoses[i]; break; }
+  }
   if (!d) return;
   state.currentId = id;
   state.qIndex = 0;
   state.scores = {};
-  d.types.forEach(t => { state.scores[t] = 0; });
-  $('quiz-title-text').textContent = d.title;
+  for (var j = 0; j < d.types.length; j++) { state.scores[d.types[j]] = 0; }
+  getEl('quiz-title-text').textContent = d.title;
   showView('quiz');
   renderQuestion();
 }
 
 function renderQuestion() {
-  const d = diagnoses.find(x => x.id === state.currentId);
-  const qi = state.qIndex;
-  const q = d.questions[qi];
-  const pct = (qi / 10) * 100;
+  var d = null;
+  for (var i = 0; i < diagnoses.length; i++) {
+    if (diagnoses[i].id === state.currentId) { d = diagnoses[i]; break; }
+  }
+  var qi = state.qIndex;
+  var q = d.questions[qi];
+  var pct = (qi / 10) * 100;
 
-  $('q-num').textContent = qi + 1;
-  $('progress-fill').style.width = pct + '%';
-  $('question-text').textContent = q.q;
+  getEl('q-num').textContent = qi + 1;
+  getEl('progress-fill').style.width = pct + '%';
+  getEl('question-text').textContent = q.q;
 
-  const labels = ['A', 'B', 'C', 'D'];
-  $('options-list').innerHTML = q.options.map((opt, i) => `
-    <button class="option-btn" data-type="${opt.type}" onclick="selectAnswer(this,'${opt.type}')">
-      <span class="option-label">${labels[i]}</span>
-      <span>${opt.text}</span>
-    </button>
-  `).join('');
+  var labels = ['A', 'B', 'C', 'D'];
+  var html = '';
+  for (var k = 0; k < q.options.length; k++) {
+    html += '<button class="option-btn" data-type="' + q.options[k].type + '">' +
+      '<span class="option-label">' + labels[k] + '</span>' +
+      '<span>' + q.options[k].text + '</span>' +
+      '</button>';
+  }
+  getEl('options-list').innerHTML = html;
 
-  const area = $('question-area');
+  var area = getEl('question-area');
   area.classList.remove('fade-in', 'fade-out');
-  requestAnimationFrame(() => area.classList.add('fade-in'));
+  requestAnimationFrame(function() { area.classList.add('fade-in'); });
 }
 
-function selectAnswer(btn, type) {
-  document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; });
+function handleOptionClick(e) {
+  var btn = e.target.closest('.option-btn');
+  if (!btn || btn.disabled) return;
+  var type = btn.getAttribute('data-type');
+  var btns = document.querySelectorAll('.option-btn');
+  btns.forEach(function(b) { b.disabled = true; });
   btn.classList.add('selected');
-  state.scores[type] = (state.scores[type] || 0) + 1;
+  if (state.scores[type] === undefined) state.scores[type] = 0;
+  state.scores[type]++;
   state.qIndex++;
 
   if (state.qIndex >= 10) {
     setTimeout(showResult, 380);
   } else {
-    const area = $('question-area');
+    var area = getEl('question-area');
     area.classList.add('fade-out');
-    setTimeout(() => {
+    setTimeout(function() {
       area.classList.remove('fade-out');
       renderQuestion();
     }, 230);
@@ -783,43 +796,62 @@ function selectAnswer(btn, type) {
 
 // ── RESULT ────────────────────────────────────────────────
 function showResult() {
-  const d = diagnoses.find(x => x.id === state.currentId);
-  let maxScore = -1, winType = d.types[0];
-  d.types.forEach(t => {
-    if (state.scores[t] > maxScore) { maxScore = state.scores[t]; winType = t; }
-  });
+  var d = null;
+  for (var i = 0; i < diagnoses.length; i++) {
+    if (diagnoses[i].id === state.currentId) { d = diagnoses[i]; break; }
+  }
+  var maxScore = -1, winType = d.types[0];
+  for (var j = 0; j < d.types.length; j++) {
+    var t = d.types[j];
+    if ((state.scores[t] || 0) > maxScore) { maxScore = state.scores[t]; winType = t; }
+  }
 
-  const result = d.typeDetails[winType];
-  $('result-diag-icon').textContent = d.icon;
-  $('result-type-name').textContent = result.name;
-  $('result-desc').textContent = result.desc;
-  $('result-advice').textContent = result.advice;
+  var result = d.typeDetails[winType];
+  getEl('result-diag-icon').textContent = d.icon;
+  getEl('result-type-name').textContent = result.name;
+  getEl('result-desc').textContent = result.desc;
+  getEl('result-advice').textContent = result.advice;
 
-  $('share-btn').onclick = () => {
-    const text = encodeURIComponent(
-      `【タイプ診断】${d.title}\n\n私は「${result.name}」でした！\n\nあなたのタイプは？ #タイプ診断`
-    );
-    const url = encodeURIComponent('https://kkkishigami.github.io/KKKishigami_github.io/diagnosis/');
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  var shareTitle = d.title;
+  var shareName = result.name;
+  getEl('share-btn').onclick = function() {
+    var text = encodeURIComponent('【タイプ診断】' + shareTitle + '\n\n私は「' + shareName + '」でした！\n\nあなたのタイプは？ #タイプ診断');
+    var url = encodeURIComponent('https://kkkishigami.github.io/KKKishigami_github.io/diagnosis/');
+    window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
   };
 
   showView('result');
 }
 
 // ── INIT ──────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   renderList();
 
-  $('logo-link').addEventListener('click', e => {
+  // Card click – event delegation on grid
+  getEl('diagnosis-grid').addEventListener('click', function(e) {
+    var card = e.target.closest('.diag-card');
+    if (card) startDiagnosis(parseInt(card.getAttribute('data-id'), 10));
+  });
+  getEl('diagnosis-grid').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      var card = e.target.closest('.diag-card');
+      if (card) startDiagnosis(parseInt(card.getAttribute('data-id'), 10));
+    }
+  });
+
+  // Option buttons – event delegation on options list
+  getEl('options-list').addEventListener('click', handleOptionClick);
+
+  getEl('logo-link').addEventListener('click', function(e) {
     e.preventDefault();
     showView('list');
   });
 
-  $('back-btn').addEventListener('click', () => showView('list'));
+  getEl('back-btn').addEventListener('click', function() { showView('list'); });
 
-  $('retry-btn').addEventListener('click', () => startDiagnosis(state.currentId));
+  getEl('retry-btn').addEventListener('click', function() { startDiagnosis(state.currentId); });
 
-  $('top-btn').addEventListener('click', () => {
+  getEl('top-btn').addEventListener('click', function() {
     showView('list');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
